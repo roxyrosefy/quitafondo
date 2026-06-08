@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuitaFondo AI • Removedor de Fondos Preciso</title>
+    <meta name="description" content="Elimina el fondo de tus imágenes con IA de forma precisa y 100% privada. Todo se procesa en tu navegador. Ideal para productos, retratos y contenido para Instagram.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
+        
+        :root {
+            --primary: #6366f1;
+        }
+        
+        body {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+        
+        .font-display {
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
+            font-weight: 600;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-card {
+            background: #111827;
+            border: 1px solid #374151;
+        }
+
+        .modern-shadow {
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.4);
+        }
+
+        .bg-checkerboard {
+            background-image: 
+                linear-gradient(45deg, #374151 25%, transparent 25%), 
+                linear-gradient(-45deg, #374151 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #374151 75%), 
+                linear-gradient(-45deg, transparent 75%, #374151 75%);
+            background-size: 24px 24px;
+            background-position: 0 0, 0 12px, 12px -12px, -12px 0px;
+        }
+
+        .dropzone {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .dropzone.dragover {
+            background-color: rgba(99, 102, 241, 0.1);
+            border-color: #6366f1;
+            transform: scale(1.01);
+        }
+
+        .result-img {
+            max-height: 420px;
+            object-fit: contain;
+            width: 100%;
+            border-radius: 12px;
+        }
+
+        .nav-active {
+            color: white;
+            border-bottom: 2px solid #6366f1;
+        }
+
+        .ai-badge {
+            background: linear-gradient(90deg, #6366f1, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        .processing-bar {
+            animation: progress 2s ease-in-out infinite;
+        }
+
+        .image-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 16px;
+            background: #1f2937;
+        }
+
+        .label-pill {
+            background: rgba(17, 24, 39, 0.9);
+            backdrop-filter: blur(8px);
+        }
+
+        .tool-container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .metric {
+            font-variant-numeric: tabular-nums;
+        }
+    </style>
+</head>
+<body class="bg-[#0a0f1a] text-gray-200">
+    <!-- Navbar -->
+    <nav class="border-b border-gray-800 bg-[#0a0f1a]/95 backdrop-blur-lg sticky top-0 z-50">
+        <div class="max-w-screen-xl mx-auto px-6">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-x-3">
+                    <!-- Logo -->
+                    <div class="flex items-center gap-x-2.5">
+                        <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                            <i class="fa-solid fa-magic text-white text-2xl"></i>
+                        </div>
+                        <div>
+                            <span class="font-display text-2xl font-semibold tracking-tighter">QuitaFondo</span>
+                            <span class="text-xs font-mono text-indigo-400 tracking-[2px] block -mt-1">AI</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-x-8 text-sm">
+                    <a href="#como-funciona" class="hover:text-white transition-colors text-gray-400">¿Cómo funciona?</a>
+                    <a href="#privacidad" class="hover:text-white transition-colors text-gray-400">Privacidad</a>
+                    <a href="https://github.com/andresjose21" target="_blank" 
+                       class="flex items-center gap-x-2 px-4 py-2 text-sm hover:bg-gray-800 rounded-xl transition-all border border-gray-700 hover:border-gray-600">
+                        <i class="fa-brands fa-github"></i>
+                        <span class="hidden sm:inline">GitHub</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <div class="max-w-screen-xl mx-auto px-6 pt-12 pb-8">
+        <div class="text-center max-w-3xl mx-auto">
+            <div class="inline-flex items-center gap-x-2 px-4 py-1.5 rounded-3xl bg-gray-900 border border-gray-800 mb-6">
+                <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                <span class="text-xs font-medium tracking-widest text-emerald-400">100% PRIVADO • EN TU NAVEGADOR</span>
+            </div>
+            
+            <h1 class="font-display text-6xl sm:text-7xl tracking-tighter font-semibold leading-none mb-4">
+                Quita el fondo<br>
+                <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-fuchsia-400 bg-clip-text text-transparent">con precisión de IA</span>
+            </h1>
+            
+            <p class="text-xl text-gray-400 max-w-lg mx-auto">
+                Elimina fondos de forma precisa como PhotoRoom. 
+                Ideal para productos, retratos y contenido de Instagram.
+            </p>
+            
+            <div class="flex items-center justify-center gap-x-4 mt-8">
+                <a href="#herramienta" 
+                   class="inline-flex items-center justify-center gap-x-3 bg-white text-gray-900 hover:bg-gray-100 transition-all px-8 h-14 rounded-3xl font-semibold text-base shadow-xl active:scale-[0.985]">
+                    <span>Probar ahora gratis</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+                <a href="#como-funciona" 
+                   class="inline-flex items-center justify-center gap-x-2 px-6 h-14 rounded-3xl font-medium border border-gray-700 hover:bg-gray-900 transition-all">
+                    <span>Ver cómo funciona</span>
+                </a>
+            </div>
+            
+            <div class="mt-6 flex items-center justify-center gap-x-8 text-xs text-gray-500">
+                <div class="flex items-center gap-x-1.5">
+                    <i class="fa-solid fa-check text-emerald-400"></i>
+                    <span>Sin registro</span>
+                </div>
+                <div class="flex items-center gap-x-1.5">
+                    <i class="fa-solid fa-check text-emerald-400"></i>
+                    <span>Sin límites</span>
+                </div>
+                <div class="flex items-center gap-x-1.5">
+                    <i class="fa-solid fa-check text-emerald-400"></i>
+                    <span>Resultados en segundos</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Tool -->
+    <div id="herramienta" class="max-w-screen-xl mx-auto px-6 pb-16">
+        <div class="tool-container">
+            
+            <!-- Upload Card -->
+            <div id="upload-card" class="section-card rounded-3xl p-2 modern-shadow">
+                <div id="dropzone" 
+                     class="dropzone border-2 border-dashed border-gray-700 hover:border-indigo-500/70 rounded-[22px] px-8 py-16 flex flex-col items-center justify-center text-center cursor-pointer transition-all bg-[#0f172a]">
+                    
+                    <div class="w-20 h-20 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 rounded-3xl flex items-center justify-center mb-6 ring-1 ring-inset ring-indigo-500/20">
+                        <i class="fa-solid fa-cloud-upload-alt text-5xl text-indigo-400"></i>
+                    </div>
+                    
+                    <h3 class="text-3xl font-semibold tracking-tight mb-2">Arrastra tu imagen aquí</h3>
+                    <p class="text-gray-400 max-w-xs mx-auto mb-6">o haz clic para seleccionar un archivo</p>
+                    
+                    <div class="flex items-center gap-x-3 text-xs">
+                        <div class="px-4 py-2 bg-gray-900 rounded-2xl border border-gray-700 text-gray-400 flex items-center gap-x-2">
+                            <i class="fa-solid fa-file-image"></i>
+                            <span>JPG • PNG • WEBP</span>
+                        </div>
+                        <div class="px-4 py-2 bg-gray-900 rounded-2xl border border-gray-700 text-gray-400">
+                            Máx. 15 MB
+                        </div>
+                    </div>
+                    
+                    <input type="file" id="file-input" class="hidden" accept="image/jpeg,image/png,image/webp">
+                </div>
+            </div>
+
+            <!-- Processing State -->
+            <div id="processing-card" class="hidden section-card rounded-3xl p-8 modern-shadow">
+                <div class="flex flex-col items-center justify-center py-8">
+                    <div class="relative mb-8">
+                        <div class="w-20 h-20 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i class="fa-solid fa-magic text-4xl text-indigo-400"></i>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-2xl font-semibold tracking-tight mb-2">Procesando con IA...</h3>
+                    <p id="processing-text" class="text-gray-400 text-center max-w-sm">
+                        Esto puede tardar entre 4 y 15 segundos.<br>
+                        <span class="text-xs">La primera vez se descarga el modelo (~40 MB)</span>
+                    </p>
+                    
+                    <div class="w-full max-w-xs mt-8">
+                        <div class="h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                            <div class="h-full w-3/4 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full processing-bar" 
+                                 style="animation: progress 1.8s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Card -->
+            <div id="results-card" class="hidden section-card rounded-3xl overflow-hidden modern-shadow">
+                <div class="p-6 pb-0">
+                    <div class="flex items-center justify-between mb-5 px-1">
+                        <div>
+                            <h3 class="font-semibold text-2xl tracking-tight">¡Listo! Fondo eliminado</h3>
+                            <p class="text-emerald-400 text-sm flex items-center gap-x-1.5 mt-0.5">
+                                <i class="fa-solid fa-check-circle"></i> 
+                                <span>Procesado localmente con IA</span>
+                            </p>
+                        </div>
+                        
+                        <button onclick="resetTool()" 
+                                class="flex items-center gap-x-2 text-sm px-5 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 active:bg-gray-700 transition-colors">
+                            <i class="fa-solid fa-redo mr-1.5"></i>
+                            <span class="font-medium">Nueva imagen</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Before / After -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-px bg-gray-800 p-2">
+                    
+                    <!-- Original -->
+                    <div class="p-5 bg-[#111827]">
+                        <div class="flex items-center justify-between mb-3 px-1">
+                            <div class="flex items-center gap-x-2">
+                                <span class="font-medium text-sm tracking-wider text-gray-400">ORIGINAL</span>
+                            </div>
+                            <span id="original-size" class="text-[10px] font-mono px-2.5 py-px bg-gray-800 text-gray-500 rounded"></span>
+                        </div>
+                        <div class="image-container border border-gray-700">
+                            <img id="original-preview" class="result-img w-full" alt="Imagen original">
+                        </div>
+                    </div>
+                    
+                    <!-- Result -->
+                    <div class="p-5 bg-[#111827]">
+                        <div class="flex items-center justify-between mb-3 px-1">
+                            <div class="flex items-center gap-x-2">
+                                <span class="font-medium text-sm tracking-wider text-emerald-400">FONDO ELIMINADO</span>
+                            </div>
+                            <span id="result-size" class="text-[10px] font-mono px-2.5 py-px bg-emerald-900/30 text-emerald-400 rounded"></span>
+                        </div>
+                        <div class="image-container border border-gray-700 bg-checkerboard">
+                            <img id="result-preview" class="result-img w-full" alt="Imagen sin fondo">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Download Options -->
+                <div class="p-6 bg-[#0f172a]">
+                    <div class="mb-4 px-1">
+                        <span class="text-xs uppercase tracking-[1.5px] text-gray-500 font-medium">Descargar resultado</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        
+                        <!-- PNG Transparent -->
+                        <button onclick="downloadTransparentPNG()" 
+                                class="group flex flex-col items-center justify-center gap-y-2 px-4 py-4 rounded-2xl bg-gray-900 hover:bg-emerald-600/90 active:bg-emerald-700 border border-gray-700 hover:border-emerald-500 transition-all">
+                            <div class="w-9 h-9 flex items-center justify-center text-emerald-400 group-hover:text-white transition-colors">
+                                <i class="fa-solid fa-download text-3xl"></i>
+                            </div>
+                            <div class="text-center">
+                                <div class="font-semibold text-sm">PNG Transparente</div>
+                                <div class="text-[10px] text-gray-500 group-hover:text-emerald-200">Mejor calidad</div>
+                            </div>
+                        </button>
+                        
+                        <!-- White BG -->
+                        <button onclick="downloadWithBackground('#ffffff')" 
+                                class="group flex flex-col items-center justify-center gap-y-2 px-4 py-4 rounded-2xl bg-gray-900 hover:bg-white active:bg-gray-100 border border-gray-700 hover:border-white transition-all">
+                            <div class="w-9 h-9 flex items-center justify-center text-white group-hover:text-gray-900 transition-colors">
+                                <i class="fa-solid fa-square text-3xl"></i>
+                            </div>
+                            <div class="text-center">
+                                <div class="font-semibold text-sm group-hover:text-gray-900">Fondo Blanco</div>
+                                <div class="text-[10px] text-gray-500 group-hover:text-gray-600">JPG listo para usar</div>
+                            </div>
+                        </button>
+                        
+                        <!-- Black BG -->
+                        <button onclick="downloadWithBackground('#111827')" 
+                                class="group flex flex-col items-center justify-center gap-y-2 px-4 py-4 rounded-2xl bg-gray-900 hover:bg-gray-950 active:bg-black border border-gray-700 hover:border-gray-400 transition-all">
+                            <div class="w-9 h-9 flex items-center justify-center text-gray-300 group-hover:text-white transition-colors">
+                                <i class="fa-solid fa-square text-3xl"></i>
+                            </div>
+                            <div class="text-center">
+                                <div class="font-semibold text-sm group-hover:text-white">Fondo Negro</div>
+                                <div class="text-[10px] text-gray-500 group-hover:text-gray-400">Para modo oscuro</div>
+                            </div>
+                        </button>
+                        
+                        <!-- Custom Color -->
+                        <div class="group flex flex-col items-center justify-center gap-y-2 px-4 py-4 rounded-2xl bg-gray-900 border border-gray-700 hover:border-purple-500 transition-all relative">
+                            <label class="cursor-pointer flex flex-col items-center w-full">
+                                <div class="w-9 h-9 flex items-center justify-center text-purple-400 group-hover:text-purple-300 transition-colors">
+                                    <i class="fa-solid fa-palette text-3xl"></i>
+                                </div>
+                                <div class="text-center mt-1">
+                                    <div class="font-semibold text-sm">Color personalizado</div>
+                                </div>
+                                <input type="color" id="color-picker" value="#6366f1" 
+                                       class="absolute opacity-0 w-0 h-0" onchange="downloadWithCustomColor()">
+                            </label>
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="mt-5 text-center">
+                        <p class="text-xs text-gray-500">El archivo PNG mantiene la máxima calidad y transparencia perfecta para edición posterior.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error State -->
+            <div id="error-card" class="hidden section-card rounded-3xl p-8 text-center modern-shadow">
+                <i class="fa-solid fa-exclamation-triangle text-5xl text-amber-400 mb-4"></i>
+                <h3 class="text-2xl font-semibold mb-2">Algo salió mal</h3>
+                <p id="error-message" class="text-gray-400 mb-6 max-w-sm mx-auto"></p>
+                <button onclick="resetTool()" 
+                        class="px-8 py-3 rounded-2xl bg-gray-800 hover:bg-gray-700 border border-gray-600 text-sm font-medium transition-colors">
+                    Intentar de nuevo
+                </button>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- How it works -->
+    <div id="como-funciona" class="max-w-screen-xl mx-auto px-6 py-12 border-t border-gray-800">
+        <div class="max-w-2xl mx-auto text-center mb-10">
+            <span class="text-indigo-400 text-xs tracking-[2px] font-semibold">TECNOLOGÍA</span>
+            <h2 class="font-display text-4xl tracking-tight mt-2">¿Cómo funciona QuitaFondo?</h2>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-5 max-w-5xl mx-auto">
+            <div class="section-card rounded-3xl p-6">
+                <div class="text-indigo-400 mb-4"><i class="fa-solid fa-upload text-3xl"></i></div>
+                <h4 class="font-semibold text-lg mb-2">1. Subes tu imagen</h4>
+                <p class="text-gray-400 text-sm">Arrastra o selecciona cualquier foto. Todo queda en tu dispositivo.</p>
+            </div>
+            <div class="section-card rounded-3xl p-6">
+                <div class="text-purple-400 mb-4"><i class="fa-solid fa-brain text-3xl"></i></div>
+                <h4 class="font-semibold text-lg mb-2">2. IA procesa localmente</h4>
+                <p class="text-gray-400 text-sm">Usamos un modelo de segmentación avanzado (ONNX + WebAssembly) que corre completamente en tu navegador.</p>
+            </div>
+            <div class="section-card rounded-3xl p-6">
+                <div class="text-emerald-400 mb-4"><i class="fa-solid fa-download text-3xl"></i></div>
+                <h4 class="font-semibold text-lg mb-2">3. Descargas el resultado</h4>
+                <p class="text-gray-400 text-sm">Obtienes un PNG con fondo transparente de alta precisión, listo para usar en cualquier editor.</p>
+            </div>
+        </div>
+        
+        <div class="text-center mt-8 text-xs text-gray-500 max-w-md mx-auto">
+            El modelo de IA se descarga solo la primera vez y queda en caché. 
+            No enviamos tus imágenes a ningún servidor.
+        </div>
+    </div>
+
+    <!-- Privacy -->
+    <div id="privacidad" class="max-w-screen-xl mx-auto px-6 pb-16">
+        <div class="section-card rounded-3xl p-8 max-w-3xl mx-auto border border-gray-700">
+            <div class="flex gap-4">
+                <div>
+                    <i class="fa-solid fa-shield-halved text-4xl text-emerald-400"></i>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-semibold text-xl mb-2">Privacidad total garantizada</h3>
+                    <ul class="text-sm text-gray-400 space-y-1.5">
+                        <li class="flex items-start gap-x-2"><i class="fa-solid fa-check mt-1 text-emerald-400 text-xs"></i> <span>Tu imagen nunca sale de tu navegador</span></li>
+                        <li class="flex items-start gap-x-2"><i class="fa-solid fa-check mt-1 text-emerald-400 text-xs"></i> <span>No recopilamos datos ni tenemos servidores</span></li>
+                        <li class="flex items-start gap-x-2"><i class="fa-solid fa-check mt-1 text-emerald-400 text-xs"></i> <span>Ideal para contenido sensible o trabajo profesional</span></li>
+                        <li class="flex items-start gap-x-2"><i class="fa-solid fa-check mt-1 text-emerald-400 text-xs"></i> <span>Funciona offline después de la primera carga del modelo</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="border-t border-gray-800 py-8 text-center text-xs text-gray-500">
+        <p>Hecho con ❤️ para creadores de contenido • Inspirado en PhotoRoom</p>
+        <p class="mt-1">Versión 1.0 • Tecnología: @imgly/background-removal + ONNX Runtime Web</p>
+    </footer>
+
+    <script>
+        // Tailwind script
+        function initializeTailwind() {
+            document.documentElement.style.setProperty('--accent', '#6366f1');
+            
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            'display': ['Space Grotesk', 'Inter', 'system-ui', 'sans-serif']
+                        }
+                    }
+                }
+            };
+        }
+
+        let currentOriginalFile = null;
+        let currentResultBlob = null;
+        let originalImageURL = null;
+        let resultImageURL = null;
+
+        function initializeDropzone() {
+            const dropzone = document.getElementById('dropzone');
+            const fileInput = document.getElementById('file-input');
+
+            // Click to upload
+            dropzone.addEventListener('click', () => fileInput.click());
+
+            // Drag and drop
+            dropzone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropzone.classList.add('dragover');
+            });
+
+            dropzone.addEventListener('dragleave', () => {
+                dropzone.classList.remove('dragover');
+            });
+
+            dropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropzone.classList.remove('dragover');
+                
+                if (e.dataTransfer.files.length > 0) {
+                    handleFile(e.dataTransfer.files[0]);
+                }
+            });
+
+            // File input change
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleFile(e.target.files[0]);
+                }
+            });
+
+            // Keyboard support
+            dropzone.setAttribute('tabindex', '0');
+            dropzone.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    fileInput.click();
+                }
+            });
+        }
+
+        async function handleFile(file) {
+            // Validate file type
+            const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+            if (!validTypes.includes(file.type)) {
+                showError('Por favor sube una imagen en formato JPG, PNG o WEBP.');
+                return;
+            }
+
+            // Size limit ~15MB
+            if (file.size > 15 * 1024 * 1024) {
+                showError('La imagen es demasiado grande. Por favor usa una de menos de 15 MB.');
+                return;
+            }
+
+            currentOriginalFile = file;
+            
+            // Hide upload, show processing
+            document.getElementById('upload-card').classList.add('hidden');
+            document.getElementById('processing-card').classList.remove('hidden');
+            document.getElementById('results-card').classList.add('hidden');
+            document.getElementById('error-card').classList.add('hidden');
+
+            // Show original preview immediately
+            originalImageURL = URL.createObjectURL(file);
+            
+            // Start processing
+            await processImage(file);
+        }
+
+        async function processImage(file) {
+            const processingText = document.getElementById('processing-text');
+            
+            try {
+                processingText.innerHTML = `
+                    Analizando imagen con IA...<br>
+                    <span class="text-xs text-gray-500">Esto puede tardar unos segundos</span>
+                `;
+
+                // Dynamic import of the library (only loads when needed)
+                let imglyRemoveBackground;
+                
+                try {
+                    // Using latest stable version from jsDelivr ESM
+                    const module = await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@latest/+esm');
+                    imglyRemoveBackground = module.default || module.removeBackground || module;
+                } catch (importErr) {
+                    console.error('Error importing library:', importErr);
+                    throw new Error('No se pudo cargar la librería de IA. Intenta recargar la página o usa Chrome/Edge.');
+                }
+
+                // Optional config - helps with asset loading in some environments
+                const config = {
+                    output: { format: 'image/png' },
+                    // publicPath can help in some static hosting scenarios
+                    // publicPath: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.0/dist/'
+                };
+
+                processingText.innerHTML = `
+                    Eliminando el fondo...<br>
+                    <span class="text-xs">El modelo de IA está trabajando en tu imagen</span>
+                `;
+
+                // Run background removal
+                const resultBlob = await imglyRemoveBackground(file, config);
+                
+                currentResultBlob = resultBlob;
+                resultImageURL = URL.createObjectURL(resultBlob);
+
+                // Show results
+                showResults();
+
+            } catch (error) {
+                console.error('Processing error:', error);
+                
+                let message = 'Ocurrió un error al procesar la imagen.';
+                
+                if (error.message && error.message.includes('model')) {
+                    message = 'No se pudo descargar el modelo de IA. Verifica tu conexión a internet la primera vez.';
+                } else if (error.message && error.message.includes('WebAssembly')) {
+                    message = 'Tu navegador no soporta las tecnologías necesarias (WebAssembly). Prueba con Chrome o Edge actualizado.';
+                } else if (error.message) {
+                    message = error.message;
+                }
+                
+                showError(message);
+            }
+        }
+
+        function showResults() {
+            // Hide processing
+            document.getElementById('processing-card').classList.add('hidden');
+            
+            // Show results
+            const resultsCard = document.getElementById('results-card');
+            resultsCard.classList.remove('hidden');
+
+            // Set original image
+            const originalImg = document.getElementById('original-preview');
+            originalImg.src = originalImageURL;
+            
+            // Set result image
+            const resultImg = document.getElementById('result-preview');
+            resultImg.src = resultImageURL;
+
+            // Update sizes
+            if (currentOriginalFile) {
+                document.getElementById('original-size').textContent = formatFileSize(currentOriginalFile.size);
+            }
+            
+            if (currentResultBlob) {
+                document.getElementById('result-size').textContent = formatFileSize(currentResultBlob.size);
+            }
+
+            // Scroll into view nicely
+            setTimeout(() => {
+                resultsCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        function downloadTransparentPNG() {
+            if (!currentResultBlob) return;
+            
+            const url = URL.createObjectURL(currentResultBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'sin-fondo.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function downloadWithBackground(backgroundColor) {
+            if (!currentResultBlob) return;
+
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+
+            img.onload = function() {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                
+                // Fill background
+                ctx.fillStyle = backgroundColor;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw the transparent image on top
+                ctx.drawImage(img, 0, 0);
+                
+                // Convert to blob and download
+                canvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = backgroundColor === '#ffffff' ? 'fondo-blanco.jpg' : 'fondo-negro.jpg';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 'image/jpeg', 0.95);
+            };
+
+            img.src = resultImageURL;
+        }
+
+        function downloadWithCustomColor() {
+            const colorPicker = document.getElementById('color-picker');
+            const color = colorPicker.value;
+            downloadWithBackground(color);
+        }
+
+        function showError(message) {
+            document.getElementById('upload-card').classList.add('hidden');
+            document.getElementById('processing-card').classList.add('hidden');
+            document.getElementById('results-card').classList.add('hidden');
+            
+            const errorCard = document.getElementById('error-card');
+            document.getElementById('error-message').textContent = message;
+            errorCard.classList.remove('hidden');
+        }
+
+        function resetTool() {
+            // Clean up URLs
+            if (originalImageURL) {
+                URL.revokeObjectURL(originalImageURL);
+                originalImageURL = null;
+            }
+            if (resultImageURL) {
+                URL.revokeObjectURL(resultImageURL);
+                resultImageURL = null;
+            }
+
+            currentOriginalFile = null;
+            currentResultBlob = null;
+
+            // Reset UI
+            document.getElementById('upload-card').classList.remove('hidden');
+            document.getElementById('processing-card').classList.add('hidden');
+            document.getElementById('results-card').classList.add('hidden');
+            document.getElementById('error-card').classList.add('hidden');
+
+            // Reset file input
+            const fileInput = document.getElementById('file-input');
+            fileInput.value = '';
+            
+            // Scroll back to top of tool
+            document.getElementById('herramienta').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Keyboard shortcuts
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', (e) => {
+                // Escape to reset when results are shown
+                if (e.key === 'Escape') {
+                    const resultsVisible = !document.getElementById('results-card').classList.contains('hidden');
+                    if (resultsVisible) {
+                        resetTool();
+                    }
+                }
+                
+                // Cmd/Ctrl + K to focus upload
+                if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+                    e.preventDefault();
+                    const uploadCard = document.getElementById('upload-card');
+                    if (!uploadCard.classList.contains('hidden')) {
+                        document.getElementById('file-input').click();
+                    } else {
+                        resetTool();
+                    }
+                }
+            });
+
+            // Show hint in console for developers
+            console.log('%c[QuitaFondo] Atajos: ESC = reiniciar | Cmd/Ctrl+K = subir nueva imagen', 'color:#64748b');
+        }
+
+        // Initialize everything
+        function init() {
+            initializeTailwind();
+            initializeDropzone();
+            setupKeyboardShortcuts();
+
+            // Optional: Preload hint for better UX (model will still lazy load)
+            console.log('%c[QuitaFondo AI] Herramienta lista. El modelo de IA se cargará al procesar la primera imagen.', 'color:#64748b');
+            
+            // Easter egg: click logo to show tech info
+            const logo = document.querySelector('.fa-magic');
+            if (logo) {
+                logo.parentElement.addEventListener('click', () => {
+                    const techInfo = 'Tecnología: @imgly/background-removal (ONNX + WebAssembly) • 100% cliente';
+                    const originalTitle = document.title;
+                    document.title = techInfo;
+                    setTimeout(() => { document.title = originalTitle; }, 2200);
+                });
+            }
+        }
+
+        // Boot the app
+        window.onload = init;
+    </script>
+</body>
+</html>
